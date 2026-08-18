@@ -59,3 +59,30 @@
 - **Próximo paso recomendado:** Publicar la rama `integration/2026-map-pool` hacia el remoto `origin` (`djaraar89/PeepMode`).
 - **Mensaje de commit propuesto:** `chore: configure personal fork remotes`
 
+## 2026-08-18 13:42 — Creación de rama Blackrock y auditoría arquitectural
+
+- **Rama:** `map/blackrock`
+- **Commit base:** `4487f910d2f05e711a0f0e597a80ac4a614b2d4c`
+- **Objetivo:** Crear y publicar la rama de trabajo aislada `map/blackrock` y auditar en modo de solo lectura la estructura arquitectural del repositorio, los componentes de PeepMode, el flujo histórico de incorporación de mapas ladder y los riesgos operativos asociados al Editor de StarCraft II.
+- **Estado previo:** Rama `integration/2026-map-pool` activa y publicada en `origin`. Sin rama específica para el mapa piloto Blackrock.
+- **Archivos modificados:**
+  - `docs/WORKLOG.md`
+- **Cambios realizados:**
+  - Creación de la rama `map/blackrock` a partir de `integration/2026-map-pool` (`4487f91`) y publicación exclusiva en el fork personal `origin`.
+  - Auditoría de arquitectura en modo solo lectura de `README.md`, `_config.yml`, `SC2Components.SC2Map/`, `src/` (`Published`/`Deprecated`), `reference/` (`PeepMode.c`, `TriggerMap.md`) y `export/` (`Assets/`, layouts y estilos).
+  - Inspección del historial Git de commits de rotación e importación de mapas (`bc03813`, `c688809`, `34d7c0b`, `1994b58`, `653227a`, `e3d0e80`, `f3bc76a`).
+  - Identificación de los componentes esenciales de PeepMode (triggers XML de 495k líneas, Galaxy script, GameData XML, layouts de observador, texturas de interfaz y 10 slots de jugador) vs. componentes de mapa ladder base (terreno, mallas de pathing/placement, doodads, iluminación).
+  - Formulación de la estrategia preliminar no destructiva y reversible para la integración de Blackrock como mapa piloto.
+  - Cero operaciones con el Editor de SC2, cero descargas/importaciones de mapas y cero modificaciones en archivos funcionales.
+- **Operaciones del Editor de SC2:** `Ninguna`
+- **Validaciones ejecutadas:**
+  - Verificación del árbol de trabajo y ramas (`git branch -vv`, `git status --short --branch`, `git rev-parse HEAD`).
+  - Verificación de publicación en remoto `origin/map/blackrock`.
+  - Comprobación estricta de diffs para garantizar integridad append-only y ausencia total de modificaciones funcionales.
+- **Resultado:** exitoso
+- **Evidencia:** Rama `map/blackrock` activa con tracking a `origin/map/blackrock`. Arquitectura documentada y comprendida exhaustivamente. Registros append-only íntegros.
+- **Problemas conocidos:** `Ninguno detectado`
+- **Próximo paso recomendado:** Presentar la propuesta preliminar de incorporación de Blackrock para validación antes de cualquier manipulación de archivos de mapa.
+- **Mensaje de commit propuesto:** `docs: record Blackrock branch and architecture audit`
+
+
