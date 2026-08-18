@@ -36,3 +36,20 @@
 - **Consecuencias:** Permite el flujo de publicación seguro vía forks y pull requests; exige verificar explícitamente el destino de los comandos `git push` para apuntar siempre a `origin`.
 - **Revisar cuando:** Se modifique la titularidad del repositorio de desarrollo o se integren nuevos mantenedores principales.
 
+
+## DEC-0003 — 2026-08-18 — Pipeline estandarizado y automatizado para mapas de la rotación
+
+- **Estado:** aceptada
+- **Contexto:** Tras completar con éxito el ciclo de ingeniería inversa, inyección y validación del mapa piloto `Blackrock LE` (Experimento 4), se identificó que la metodología de 7 fases puede automatizarse de forma determinista para los mapas restantes del pool de mapas de StarCraft II.
+- **Decisión:** Estandarizar la herramienta `tools/Build-PeepModeMap.ps1` como el mecanismo oficial para convertir mapas limpios de ladder a ediciones PeepMode, automatizando:
+  1. Extracción e inventario de componentes.
+  2. Cálculo del centro geométrico de simetría rotacional 180°.
+  3. Inyección de `Point 001` a `Point 010` con rango de IDs seguros (`100000001` a `100000010`).
+  4. Fusión no destructiva de catálogos GameData XML y cadenas de objetos.
+  5. Incorporación del núcleo invariable de PeepMode (10 slots de atributos, triggers, layouts y Galaxy script).
+  6. Adaptación de metadatos bilingües y codificación de pantalla de carga DXT1 con mipmaps.
+- **Motivo:** Reducir a cero los errores manuales, acelerar la publicación de la rotación completa y garantizar consistencia binaria y sintáctica en todos los mapas.
+- **Alternativas consideradas:**
+  - *Continuar con el proceso manual en cada mapa:* descartada por ser lento, propenso a errores de tipeo y requerir intervención repetitiva.
+- **Consecuencias:** Permite generar prototipos válidos en segundos y concentrar la intervención del usuario únicamente en la publicación en Battle.net.
+- **Revisar cuando:** Se actualice el motor base de PeepMode o se incorporen mapas con más de 2 posiciones de inicio (ej. mapas 4P).

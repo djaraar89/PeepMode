@@ -86,3 +86,32 @@
 - **Mensaje de commit propuesto:** `docs: record Blackrock branch and architecture audit`
 
 
+
+## 2026-08-18 — Experimento 4: Integración, validación y estandarización del mapa piloto Blackrock LE
+
+- **Objetivo:** Completar el ciclo de vida completo de ingeniería inversa, ensamblado de componentes, validación en Editor, prueba funcional local y multijugador, y estandarizar el pipeline automatizado para los mapas de la rotación.
+- **Rama activa:** `map/blackrock`
+- **Archivos creados o modificados:**
+  - `src/Published/PeepVoid_Blackrock_LE.SC2Map` (Versión definitiva para publicación pública)
+  - `tools/Build-PeepModeMap.ps1` (Herramienta de automatización end-to-end de mapas PeepMode)
+  - `docs/AUTOMATED_MAP_PIPELINE.md` (Especificación técnica del pipeline automatizado)
+  - `docs/DECISIONS.md` (DEC-0003)
+  - `CHANGELOG.md`
+  - `docs/WORKLOG.md`
+- **Operaciones del Editor de SC2:**
+  - Primera apertura diagnóstica limpia (dependencia `VoidMulti.SC2Mod`, 0 errores XML).
+  - Corrección precisa de coordenadas de expansiones naturales (`Point 005` al Oeste de P1, `Point 006` al Este de P2) con simetría rotacional 180° exacta `(89.0, 95.0)`.
+  - Configuración nativa de 10 slots activos de jugadores en `MapInfo`.
+  - Prueba funcional local (`Ctrl+F9`) validando interfaz, cámaras, apuestas y lógica de juego.
+  - Empaquetado a formato `.SC2Map` y verificación round-trip de componentes sin corrupción.
+  - Configuración de pantalla de carga bilingüe (Inglés/Español) y codificación DXT1 de texturas.
+- **Validaciones ejecutadas:**
+  - Verificación estricta de hashes SHA-256 en todas las fases del laboratorio.
+  - Comprobación de ausencia total de colisiones en GameData XML y ObjectStrings.
+  - Reconciliación de los 4 mensajes de runtime (`AlternateTime`, `ChatDisplayNormal`, `gt_PeriodicBettingCountdowns_Func`, `Observe Everyone`) clasificados como `IDENTICAL_TO_REFERENCE`.
+  - Verificación de integridad del repositorio (`git status`).
+- **Resultado:** exitoso
+- **Evidencia:** `PeepVoid_Blackrock_LE.SC2Map` generado y validado con 10 slots y cero errores de Galaxy. Herramienta `Build-PeepModeMap.ps1` lista para procesar los siguientes mapas.
+- **Problemas conocidos:** `Ninguno`
+- **Próximo paso recomendado:** Publicación pública global en Battle.net (Americas, Europe, Asia) y aplicación del pipeline automatizado al siguiente mapa de la rotación.
+- **Mensaje de commit propuesto:** `feat: publish PeepVoid_Blackrock_LE and establish automated map factory pipeline`
