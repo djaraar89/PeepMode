@@ -30,3 +30,32 @@
 - **Problemas conocidos:** `Ninguno detectado`
 - **Próximo paso recomendado:** Preparar la rama de trabajo dedicada para el mapa piloto `Blackrock` y realizar la auditoría inicial de sus componentes.
 - **Mensaje de commit propuesto:** `chore: establish protected workflow and project logs`
+
+## 2026-08-18 13:37 — Configuración de fork personal y topología de remotos
+
+- **Rama:** `integration/2026-map-pool`
+- **Commit base:** `3fdbb467ecbfa50f6dd90562e604f8664ea6e885`
+- **Objetivo:** Configurar el fork personal como remoto escribible `origin`, reasignar `Kelzorz/PeepMode` al remoto `kelzorz`, preservar `ktilkath/PeepMode` en `upstream` y preparar la publicación segura de la rama de integración.
+- **Estado previo:** `origin` apuntaba al repositorio de upstream de Kelzorz (`https://github.com/Kelzorz/PeepMode.git`), impidiendo la publicación directa por falta de permisos de escritura (error HTTP 403) y con imposibilidad de renombrar directamente a `upstream` debido a la preexistencia de `ktilkath/PeepMode.git` bajo dicho nombre.
+- **Archivos modificados:**
+  - `docs/WORKLOG.md`
+  - `docs/DECISIONS.md`
+- **Cambios realizados:**
+  - Registro de los incidentes previos (intento fallido de publicación directa en Kelzorz con error 403 y conflicto al renombrar a `upstream` por existencia previa del remoto).
+  - Creación manual y verificación del fork personal en `https://github.com/djaraar89/PeepMode.git`.
+  - Reconfiguración de la topología Git: renombrado del remoto original `origin` a `kelzorz` (`https://github.com/Kelzorz/PeepMode.git`), adición del nuevo remoto `origin` apuntando al fork personal y preservación intacta del remoto `upstream` (`https://github.com/ktilkath/PeepMode.git`).
+  - Sincronización de referencias mediante `git fetch --prune` para los tres remotos (`origin`, `kelzorz`, `upstream`).
+  - Documentación de la decisión `DEC-0002` en `docs/DECISIONS.md`.
+  - Confirmación de cero modificaciones en archivos funcionales de PeepMode y cero operaciones en el Editor de SC2.
+- **Operaciones del Editor de SC2:** `Ninguna`
+- **Validaciones ejecutadas:**
+  - Inspección exhaustiva de remotos (`git remote -v`).
+  - Verificación del árbol de trabajo y ramas (`git status --short --branch`, `git branch -vv`).
+  - Comprobación de commits inmutables (`git rev-parse master`, `git rev-parse HEAD`).
+  - Validación de integridad append-only en registros.
+- **Resultado:** exitoso
+- **Evidencia:** Remoto `origin` configurado correctamente a `djaraar89/PeepMode.git`, `kelzorz` a `Kelzorz/PeepMode.git` y `upstream` a `ktilkath/PeepMode.git`. Rama `master` intacta en `a0af730`.
+- **Problemas conocidos:** `Ninguno detectado`
+- **Próximo paso recomendado:** Publicar la rama `integration/2026-map-pool` hacia el remoto `origin` (`djaraar89/PeepMode`).
+- **Mensaje de commit propuesto:** `chore: configure personal fork remotes`
+
