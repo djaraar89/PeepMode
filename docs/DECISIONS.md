@@ -101,3 +101,19 @@
   - *Permitir conversor PNG simulado:* descartada por violar la política de validación real verificable.
 - **Consecuencias:** Detección instantánea de incompatibilidades en mapas complejos y control absoluto sobre los componentes generados.
 - **Revisar cuando:** Se implemente un módulo de resolución interactiva o reglas semánticas de merge configurables por JSON.
+
+## DEC-0007 — 2026-08-19 — Validación Dinámica de ObjectStrings.txt por Unión Exacta de Claves
+
+- **Estado:** aceptada
+- **Contexto:** En el Experimento 6D se detectó que la compuerta de validación `ValidateOnly` utilizaba un umbral estático mínimo (`$objStrLines -lt 50`), calibrado específicamente para Blackrock LE (que contenía 60 claves de ladder + 33 de PeepMode = 93 claves). Al procesar mapas limpios con pocas cadenas de ladder (como Washout LE, que solo declara 1 clave para luces), el total fusionado resultante de 33 claves provocaba un falso positivo con código 2 a pesar de que la fusión era 100% íntegra y completa.
+- **Decisión:**
+  1. **Eliminación de Umbrales Estáticos:** Se elimina cualquier umbral o conteo numérico rígido global para `ObjectStrings.txt`.
+  2. **Validación Dinámica por Unión de Claves:** El conjunto esperado de claves se deriva dinámicamente en tiempo de ejecución a partir de la unión exacta entre las claves de la fuente limpia (`$CleanMapPath`) y las del núcleo PeepMode (`$coreDir`).
+  3. **Control Estricto de Integridad (Exit Code 2):** Se verifica la presencia obligatoria de todas las claves esperadas, la coincidencia exacta de sus valores, la ausencia de claves duplicadas y la inexistencia de claves inesperadas en la salida. Cualquier discrepancia aborta con código de salida 2.
+  4. **Control Estricto de Conflictos de Valor (Exit Code 5):** Si una clave común entre la fuente limpia y el núcleo posee valores divergentes, la validación aborta inmediatamente con código de salida 5.
+- **Motivo:** Garantizar que la validación sea universal, agnóstica a la cantidad de cadenas de cada mapa del pool 2026 y matemáticamente rigurosa.
+- **Alternativas consideradas:**
+  - *Reducir el umbral estático a 33:* descartada por transferir el acoplamiento a Washout y fallar ante cualquier mapa con menos claves.
+  - *Omitir la validación de claves en ValidateOnly:* descartada por debilitar las garantías de integridad.
+- **Consecuencias:** Validación 100% determinista, escalable a cualquier mapa del pool y cubierta por una suite de 40 pruebas automatizadas.
+- **Revisar cuando:** Se incorpore soporte de localización multilingüe adicional fuera de `enUS`.

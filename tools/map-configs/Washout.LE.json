@@ -1,0 +1,103 @@
+﻿{
+    "$schema":  "../../../GitHub/PeepMode/tools/schemas/peepmode-map-config.schema.json",
+    "schemaVersion":  "2.0.0",
+    "mapTitle":  "Washout LE",
+    "mapAuthor":  "Patches",
+    "mapCredits":  "Original ladder map by Patches. PeepMode conversion by PeepMode Factory V2.",
+    "symmetryType":  "Rotational180",
+    "symmetryCenter":  {
+                           "x":  88,
+                           "y":  81,
+                           "source":  "calculated-midpoint"
+                       },
+    "mapInfoStrategy":  "PreserveLadderWithEditorGate",
+    "gameDataConflictPolicy":  "FailOnConflict",
+    "cleanSourceSha256":  "E6A445243680815422F342FF4649681A17C9C85849D4B591282490CE2B927E9B",
+    "points":  {
+                   "Point 001":  {
+                                     "x":  127.35,
+                                     "y":  129.61,
+                                     "z":  0,
+                                     "source":  "manual-validated",
+                                     "reviewed":  true,
+                                     "notes":  "Inspeccionado y aceptado sin mover en encuadre de base principal P1"
+                                 },
+                   "Point 002":  {
+                                     "x":  48.65,
+                                     "y":  32.39,
+                                     "z":  0,
+                                     "source":  "manual-validated",
+                                     "reviewed":  true,
+                                     "notes":  "Inspeccionado y aceptado sin mover en encuadre de base principal P2"
+                                 },
+                   "Point 003":  {
+                                     "x":  131.7221,
+                                     "y":  122.8962,
+                                     "z":  0,
+                                     "source":  "manual-validated",
+                                     "reviewed":  true,
+                                     "notes":  "Camara rampa / salida principal P1 calibrada en Editor"
+                                 },
+                   "Point 004":  {
+                                     "x":  44.2775,
+                                     "y":  39.1035,
+                                     "z":  0,
+                                     "source":  "manual-validated",
+                                     "reviewed":  true,
+                                     "notes":  "Camara rampa / salida principal P2 calibrada en Editor"
+                                 },
+                   "Point 005":  {
+                                     "x":  140.6013,
+                                     "y":  113.838,
+                                     "z":  0,
+                                     "source":  "manual-validated",
+                                     "reviewed":  true,
+                                     "notes":  "Town Hall expansion natural P1 calibrado en Editor"
+                                 },
+                   "Point 006":  {
+                                     "x":  35.3984,
+                                     "y":  48.1618,
+                                     "z":  0,
+                                     "source":  "manual-validated",
+                                     "reviewed":  true,
+                                     "notes":  "Town Hall expansion natural P2 calibrado en Editor"
+                                 },
+                   "Point 007":  {
+                                     "x":  143.3942,
+                                     "y":  25.0122,
+                                     "z":  0,
+                                     "source":  "manual-validated",
+                                     "reviewed":  true,
+                                     "notes":  "Faceoff principal P1 calibrado en Editor"
+                                 },
+                   "Point 008":  {
+                                     "x":  110.8046,
+                                     "y":  64.6665,
+                                     "z":  0,
+                                     "source":  "symmetry-inferred",
+                                     "reviewed":  true,
+                                     "notes":  "Posicionado manualmente sobre coordenada simetrica auxiliar P1"
+                                 },
+                   "Point 009":  {
+                                     "x":  32.6054,
+                                     "y":  136.9877,
+                                     "z":  0,
+                                     "source":  "manual-validated",
+                                     "reviewed":  true,
+                                     "notes":  "Faceoff principal P2 calibrado en Editor"
+                                 },
+                   "Point 010":  {
+                                     "x":  65.195,
+                                     "y":  97.3332,
+                                     "z":  0,
+                                     "source":  "symmetry-inferred",
+                                     "reviewed":  true,
+                                     "notes":  "Posicionado manualmente sobre coordenada simetrica auxiliar P2"
+                                 }
+               },
+    "reviewStatus":  {
+                         "geometryReviewed":  true,
+                         "reviewer":  "StarCraft II Editor Manual Calibration",
+                         "reviewDate":  "2026-08-19"
+                     }
+}

@@ -1,4 +1,4 @@
-﻿<#
+<#
 .SYNOPSIS
     Suite de Pruebas de Regresion, Seguridad y Cobertura para PeepMode Factory V2.
 #>
@@ -429,7 +429,7 @@ Run-TestCase 33 "DdsConverterPath apuntando a ejecutable inexistente falla con c
     }
 }
 
-# 34. LoadingImageDds inexistente o no-dds falla con cÃ³digo 1
+# 34. LoadingImageDds inexistente o no-dds falla con codigo 1
 Run-TestCase 34 "LoadingImageDds inexistente o invalido falla con codigo 1" {
     $out = Join-Path $testTempDir "out_dds_fail"
     try {
@@ -438,6 +438,90 @@ Run-TestCase 34 "LoadingImageDds inexistente o invalido falla con codigo 1" {
     } catch {
         if ($_ -notmatch "code 1") { throw "Codigo inesperado: $_" }
     }
+}
+
+# 35. Washout con union exacta de 33 claves supera ValidateOnly
+Run-TestCase 35 "Washout con union exacta de 33 claves supera ValidateOnly" {
+    $cleanWashout = "C:\SC2-PeepMode-Lab\washout\clean-components\Washout_LE.SC2Map"
+    $candidateWashout = "C:\SC2-PeepMode-Lab\washout\review\Washout.LE.candidate.json"
+    $outWashout = Join-Path $testTempDir "out_washout_test"
+    if (Test-Path $outWashout) { Remove-Item -Path $outWashout -Recurse -Force }
+    & $factoryScript -CleanMapPath $cleanWashout -OutputDir $outWashout -MapConfigPath $candidateWashout -Force
+    & $factoryScript -OutputDir $outWashout -CleanMapPath $cleanWashout -ValidateOnly
+}
+
+# 36. Eliminacion de una clave esperada retorna codigo 2
+Run-TestCase 36 "Eliminacion de una clave esperada en ObjectStrings retorna codigo 2" {
+    $cleanWashout = "C:\SC2-PeepMode-Lab\washout\clean-components\Washout_LE.SC2Map"
+    $outDel = Join-Path $testTempDir "out_obj_del"
+    if (Test-Path $outDel) { Remove-Item -Path $outDel -Recurse -Force }
+    Copy-Item -Path (Join-Path $testTempDir "out_washout_test") -Destination $outDel -Recurse
+    $objPath = Join-Path $outDel "enUS.SC2Data\LocalizedData\ObjectStrings.txt"
+    $lines = Get-Content $objPath | Where-Object { -not $_.StartsWith("Light/Name/EditorTestLight") }
+    [System.IO.File]::WriteAllLines($objPath, $lines, [System.Text.Encoding]::UTF8)
+    try {
+        & $factoryScript -OutputDir $outDel -CleanMapPath $cleanWashout -ValidateOnly
+        throw "ValidateOnly no detecto clave eliminada"
+    } catch {
+        if ($_ -notmatch "code 2") { throw "Codigo inesperado: $_" }
+    }
+}
+
+# 37. Modificacion del valor de una clave esperada retorna codigo 2
+Run-TestCase 37 "Modificacion del valor de una clave esperada retorna codigo 2" {
+    $cleanWashout = "C:\SC2-PeepMode-Lab\washout\clean-components\Washout_LE.SC2Map"
+    $outMod = Join-Path $testTempDir "out_obj_mod"
+    if (Test-Path $outMod) { Remove-Item -Path $outMod -Recurse -Force }
+    Copy-Item -Path (Join-Path $testTempDir "out_washout_test") -Destination $outMod -Recurse
+    $objPath = Join-Path $outMod "enUS.SC2Data\LocalizedData\ObjectStrings.txt"
+    $lines = Get-Content $objPath | ForEach-Object { if ($_ -match "^Light/Name/EditorTestLight=") { "Light/Name/EditorTestLight=CorruptedValue" } else { $_ } }
+    [System.IO.File]::WriteAllLines($objPath, $lines, [System.Text.Encoding]::UTF8)
+    try {
+        & $factoryScript -OutputDir $outMod -CleanMapPath $cleanWashout -ValidateOnly
+        throw "ValidateOnly no detecto valor corrupto"
+    } catch {
+        if ($_ -notmatch "code 2") { throw "Codigo inesperado: $_" }
+    }
+}
+
+# 38. Clave duplicada retorna codigo 2
+Run-TestCase 38 "Clave duplicada en ObjectStrings retorna codigo 2" {
+    $cleanWashout = "C:\SC2-PeepMode-Lab\washout\clean-components\Washout_LE.SC2Map"
+    $outDup = Join-Path $testTempDir "out_obj_dup"
+    if (Test-Path $outDup) { Remove-Item -Path $outDup -Recurse -Force }
+    Copy-Item -Path (Join-Path $testTempDir "out_washout_test") -Destination $outDup -Recurse
+    $objPath = Join-Path $outDup "enUS.SC2Data\LocalizedData\ObjectStrings.txt"
+    Add-Content -Path $objPath -Value "Light/Name/EditorTestLight=default" -Encoding UTF8
+    try {
+        & $factoryScript -OutputDir $outDup -CleanMapPath $cleanWashout -ValidateOnly
+        throw "ValidateOnly no detecto clave duplicada"
+    } catch {
+        if ($_ -notmatch "code 2") { throw "Codigo inesperado: $_" }
+    }
+}
+
+# 39. Conflicto entre fuente limpia y nucleo retorna codigo 5
+Run-TestCase 39 "Conflicto entre fuente limpia y nucleo en ObjectStrings retorna codigo 5" {
+    $cleanConflict = Join-Path $testTempDir "clean_obj_conflict"
+    if (Test-Path $cleanConflict) { Remove-Item -Path $cleanConflict -Recurse -Force }
+    Copy-Item -Path "C:\SC2-PeepMode-Lab\washout\clean-components\Washout_LE.SC2Map" -Destination $cleanConflict -Recurse
+    $objPath = Join-Path $cleanConflict "enUS.SC2Data\LocalizedData\ObjectStrings.txt"
+    [System.IO.File]::WriteAllLines($objPath, @("Light/Name/EditorTestLight=ConflictingValue"), [System.Text.Encoding]::UTF8)
+    $outConflict = Join-Path $testTempDir "out_obj_conflict"
+    try {
+        & $factoryScript -CleanMapPath $cleanConflict -OutputDir $outConflict -MapConfigPath "C:\SC2-PeepMode-Lab\washout\review\Washout.LE.candidate.json" -Force
+        throw "Build no detecto conflicto en ObjectStrings"
+    } catch {
+        if ($_ -notmatch "code 5") { throw "Codigo inesperado: $_" }
+    }
+}
+
+# 40. Blackrock continua superando ValidateOnly con su cantidad propia
+Run-TestCase 40 "Blackrock continua superando ValidateOnly con su cantidad propia" {
+    $outBr = Join-Path $testTempDir "out_blackrock_val"
+    if (Test-Path $outBr) { Remove-Item -Path $outBr -Recurse -Force }
+    & $factoryScript -CleanMapPath $cleanBlackrock -OutputDir $outBr -MapConfigPath $blackrockConfig -Force
+    & $factoryScript -OutputDir $outBr -CleanMapPath $cleanBlackrock -ValidateOnly
 }
 
 Write-Host "`n==================================================" -ForegroundColor Cyan

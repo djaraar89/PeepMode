@@ -215,3 +215,29 @@
 - **Problemas conocidos:** Ninguno.
 - **Próximo paso recomendado:** Realizar el commit formal de Factory V2 en `factory/hardening-v2` e iniciar el trabajo del segundo mapa como prototipo.
 - **Mensaje de commit propuesto:** `feat(factory): finalize hardened Factory V2 with 34-test suite, conflict gates and clean pre-editor boundary`
+
+## 2026-08-19 12:10 — Corrección Dinámica de ValidateOnly, Suite de 40 Tests y Promoción de Configuración de Washout LE (Experimento 6D)
+
+- **Rama:** `map/washout`
+- **Commit base:** `c8745c68d5bf5b0a0e8fee4aace2bbfc8a9f7a09`
+- **Objetivo:** Corregir el defecto de umbral estático de `ValidateOnly` en `ObjectStrings.txt` implementando validación dinámica por unión exacta de claves, expandir la suite de tests a 40 casos (100% OK), incorporar formalmente `tools/map-configs/Washout.LE.json`, construir la salida `PRE_EDITOR_ONLY` de Washout LE con configuración validada y verificar la preservación y simetría de componentes.
+- **Archivos modificados / creados:**
+  - `tools/Build-PeepModeMap.ps1` (validación dinámica por unión de claves en ValidateOnly, eliminación de umbrales rígidos, reporte exacto de claves faltantes, duplicadas o corruptas)
+  - `tools/tests/Test-Build-PeepModeMap.ps1` (ampliación de 34 a 40 casos de prueba automatizados)
+  - `tools/map-configs/Washout.LE.json` (configuración formal declarativa para Washout LE con 10 puntos validados y simetría rotacional 180°)
+  - `docs/AUTOMATED_MAP_PIPELINE.md` (sección 6: validación dinámica de ObjectStrings)
+  - `docs/DECISIONS.md` (DEC-0007: validación dinámica por unión exacta de claves)
+  - `CHANGELOG.md` (versión 1.1.3)
+  - `docs/WORKLOG.md` (registro acumulativo append-only)
+- **Validaciones ejecutadas:**
+  - Suite de 40 pruebas automatizadas (`Test-Build-PeepModeMap.ps1`): **40/40 PASSED (100% OK)**.
+  - Validación sintáctica y de esquema de `Washout.LE.json` contra `peepmode-map-config.schema.json`: Conforme.
+  - Construcción de Washout LE en `prototype/validated-config-v1/Washout_PreEditor.SC2Map/`: Éxito con código de salida 0 y Release Gate geométrico aprobado.
+  - Auditoría estricta con `ValidateOnly`: Éxito con código de salida 0 sobre la salida construida.
+  - Comparación de coordenadas de build configurado vs revisión manual: Error Euclidiano = 0.0000 u en los 10 puntos.
+  - Verificación de formato y espacios: `git diff --check` = 0 advertencias.
+- **Resultado:** exitoso
+- **Evidencia:** `WASHOUT_CONFIGURED_BUILD_VALIDATION.md`, `WASHOUT_GEOMETRY_REVIEW_DIFF.csv`, `WASHOUT_REVIEWED_POINTS.csv` en `C:/SC2-PeepMode-Lab/washout/`.
+- **Problemas conocidos:** Ninguno. MapInfo permanece en estado `PRE_EDITOR_ONLY` conforme al diseño de pipeline.
+- **Próximo paso recomendado:** Commit y push de la configuración de Washout LE y las mejoras de Factory V2.
+- **Mensaje de commit propuesto:** `feat(washout): add validated map config and dynamic ObjectStrings validation in Factory V2`

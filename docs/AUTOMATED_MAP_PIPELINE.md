@@ -174,3 +174,14 @@ Construir con la configuración revisada pasando el Release Gate:
    .\tools\Build-PeepModeMap.ps1 -OutputDir "C:/SC2-PeepMode-Lab/<map>/build/<Map>_V2.SC2Map" -ValidateOnly
    ```
 2. Abrir en el Editor de SC2 para compilar scripts Galaxy y guardar como `.SC2Map` monolítico final.
+
+---
+
+## 6. Validación Dinámica de Cadenas de Objetos (ObjectStrings.txt)
+
+A partir de la versión 1.1.3, `ValidateOnly` utiliza un algoritmo de validación dinámica por unión exacta de claves:
+
+1. **Derivación de Claves:** Se calculan las claves esperadas uniendo dinámicamente las cadenas del mapa limpio (`$CleanMapPath`) y las 33 cadenas declarativas del núcleo PeepMode (`SC2Components.SC2Map`).
+2. **Detección de Conflictos (Exit Code 5):** Si una clave común entre el mapa limpio y el núcleo posee valores divergentes, la validación aborta con código 5.
+3. **Comprobación de Salida (Exit Code 2):** Se verifica que la salida contenga el 100% de las claves esperadas, con valores idénticos, sin claves duplicadas y sin claves inesperadas.
+4. **Independencia del Map Pool:** No existen umbrales mínimos fijos ni acoplamiento a la cantidad de cadenas de un mapa particular (ej. Blackrock = 93 claves, Washout = 33 claves).
