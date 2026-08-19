@@ -241,3 +241,28 @@
 - **Problemas conocidos:** Ninguno. MapInfo permanece en estado `PRE_EDITOR_ONLY` conforme al diseño de pipeline.
 - **Próximo paso recomendado:** Commit y push de la configuración de Washout LE y las mejoras de Factory V2.
 - **Mensaje de commit propuesto:** `feat(washout): add validated map config and dynamic ObjectStrings validation in Factory V2`
+
+## 2026-08-19 18:00 — Validación Multijugador en Battle.net, Estándar Pre-Publicación (DEC-0008) y Promoción Oficial de Washout LE (Experimento 6J)
+
+- **Rama:** `map/washout`
+- **Commit base:** `1fdd56f7ac2775a4d1e6d00561d7bfbd99976f60`
+- **Objetivo:** Promover el artefacto final probado y validado en sesión multijugador real en Battle.net (`src/Published/PeepVoid_Washout_LE.SC2Map`), establecer el estándar pre-publicación DEC-0008 (Arcade Map, 10 slots con Control=User en Player Properties y supresión de cuenta regresiva Melee), ejecutar auditoría estructural completa y actualizar los registros del proyecto.
+- **Archivos modificados / creados:**
+  - `src/Published/PeepVoid_Washout_LE.SC2Map` (monolito final validado de Washout LE, 10.622.390 bytes, SHA-256: `207D305C9D36D03E8691447EEC40688BEA382CEAA3596CB5C8C047374057CF45`)
+  - `docs/DECISIONS.md` (DEC-0008: estándar de configuración de slots, opciones Arcade y supresión de temporizador Melee)
+  - `docs/AUTOMATED_MAP_PIPELINE.md` (sección 7: requisitos de configuración pre-publicación en el Editor)
+  - `CHANGELOG.md` (versión 1.2.0)
+  - `docs/WORKLOG.md` (registro acumulativo append-only)
+- **Detalles técnicos y validaciones ejecutadas:**
+  - Identificación inequívoca del candidato probado en Battle.net con 2 jugadores activos + observadores.
+  - Verificación de 10 puntos de cámara (`Point 001` a `Point 010`) con Error Euclidiano = 0.0000 u respecto a `Washout.LE.json` y simetría 180° exacta con centro `(88.0, 81.0)`.
+  - Preservación íntegra de ladder: 2 Start Locations, 196 unidades, 2.626 doodads, terreno y 15 catálogos `GameData` XML.
+  - Sanitización de metadatos: Cero correos/PII, créditos oficiales a Patches, Kelzorz y ktilkath.
+  - Suite de regresión automatizada: **40/40 PASSED (100% OK)**.
+  - Verificación de hash SHA-256 idéntico entre copia congelada en lab y archivo en `src/Published/`.
+  - `git diff --check`: 0 advertencias de formato o espacios.
+- **Resultado:** exitoso
+- **Evidencia:** `WASHOUT_FINAL_AUDIT.md`, `WASHOUT_FINAL_FROZEN_RECORD.md`, `WASHOUT_FINAL_CANDIDATES.md` en `C:/SC2-PeepMode-Lab/washout/release/final/`.
+- **Problemas conocidos:** Ninguno.
+- **Próximo paso recomendado:** Commit y push de la rama `map/washout`, merge a `integration/2026-map-pool` e inicio del siguiente mapa del pool 2026.
+- **Mensaje de commit propuesto:** `feat(washout): add multiplayer-validated PeepMode map`

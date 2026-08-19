@@ -50,3 +50,9 @@ Actualmente no existen cambios funcionales registrados en el proyecto.
 - **Validación Dinámica de ObjectStrings:** Implementación de algoritmo por unión exacta de claves en `ValidateOnly`, eliminando umbrales mínimos rígidos y desacoplando la validación de la cantidad de cadenas de un mapa particular.
 - **Suite de 40 Pruebas Automatizadas:** 6 nuevas pruebas de regresión en `tools/tests/Test-Build-PeepModeMap.ps1` (casos 35 a 40) cubriendo validación de conjuntos exactos, detección de claves eliminadas, valores corruptos, duplicados y conflictos de datos.
 - **Configuración Validada de Washout LE:** Incorporación de `tools/map-configs/Washout.LE.json` con 10 puntos de cámara calibrados y simetría rotacional 180° verificada (error < 0.0005 u).
+
+## [1.2.0] — 2026-08-19
+
+### Añadido
+- **Segundo Mapa Oficial Publicado:** Incorporación de `src/Published/PeepVoid_Washout_LE.SC2Map` (SHA-256: `207D305C9D36D03E8691447EEC40688BEA382CEAA3596CB5C8C047374057CF45`, 10.622.390 bytes), validado exhaustivamente en partidas multijugador en Battle.net (2 jugadores + observadores, Faceoff, apuestas, cámaras, fin de partida y revancha sin desincronizaciones).
+- **Estándar de Configuración Pre-Publicación (DEC-0008):** Estandarización de las 3 reglas indispensables para mapas del pool 2026: `Publishing Options: Arcade Map`, estructura completa de 10 slots (`Control: User`) en `Player Properties` y variante `Other - PeepMode`, y supresión de cuenta regresiva Melee (`[x] Disable Countdown Timer` / `Flags2 = 0x01`).

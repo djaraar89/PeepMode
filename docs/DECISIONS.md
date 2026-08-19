@@ -117,3 +117,18 @@
   - *Omitir la validación de claves en ValidateOnly:* descartada por debilitar las garantías de integridad.
 - **Consecuencias:** Validación 100% determinista, escalable a cualquier mapa del pool y cubierta por una suite de 40 pruebas automatizadas.
 - **Revisar cuando:** Se incorpore soporte de localización multilingüe adicional fuera de `enUS`.
+
+## DEC-0008 — 2026-08-19 — Estándar de Configuración de Slots de Jugadores, Opciones Arcade y Supresión de Cuenta Regresiva
+
+- **Estado:** aceptada
+- **Contexto:** Durante las pruebas multijugador de Washout LE (Experimento 6I) se detectaron tres divergencias críticas entre los mapas limpios de ladder 1v1 y los mapas PeepMode funcionales en Battle.net:
+  1. **Conflicto de Publicación en Blizzard:** Los mapas de ladder vienen como `Melee/Custom Map` con `Automatically Add Multiplayer Data` activo, lo que bloquea la publicación en Battle.net al coexistir con la dependencia explícita `Void Multi (Mod)`.
+  2. **Lobby Limitado a 2 Slots:** En los mapas 1v1 de ladder solo existen Player 1 y Player 2 en `Player Properties`. Sin declarar del Player 1 al Player 10 en `Player Properties` y en `Game Variants`, la sala de espera de Battle.net solo asigna 2 casillas en lugar de 10.
+  3. **Temporizador de Cuenta Regresiva Melee Innecesario:** Al no marcarse `Disable Countdown Timer`, el motor de SC2 ejecuta la cuenta regresiva 3-2-1 (`Flags2 = 0x02`) antes de iniciar la cinemática de Faceoff de PeepMode.
+- **Decisión:**
+  1. **Publishing Options:** Configurar obligatoriamente `Publishing Options: Arcade Map` en `Map Properties → Options`.
+  2. **10 Slots en Player Properties:** Definir obligatoriamente los 10 jugadores (Player 1 al Player 10) con `Control: User` en `Map → Player Properties` (`Ctrl + Shift + P`) y activarlos en la variante `Other - PeepMode` de `Map → Game Variants`.
+  3. **Supresión de Cuenta Regresiva:** Marcar obligatoriamente `[x] Disable Countdown Timer` en `Map Properties → Options` y en `Map → Game Variants`, fijando `Flags2 = 0x01`.
+- **Motivo:** Garantizar que todos los mapas de la rotación 2026 expongan los 10 slots en el lobby de Arcade, publiquen sin bloqueos de Blizzard y arranquen de inmediato en el Faceoff de PeepMode.
+- **Consecuencias:** Estandarización total de los requisitos de configuración pre-publicación en el Editor para todos los mapas restantes del pool.
+- **Revisar cuando:** Se automatice la inyección directa de Player Structs y Flags en la cabecera binaria `MapInfo` en futuras versiones de Factory.
