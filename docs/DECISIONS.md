@@ -101,3 +101,34 @@
   - *Permitir conversor PNG simulado:* descartada por violar la política de validación real verificable.
 - **Consecuencias:** Detección instantánea de incompatibilidades en mapas complejos y control absoluto sobre los componentes generados.
 - **Revisar cuando:** Se implemente un módulo de resolución interactiva o reglas semánticas de merge configurables por JSON.
+
+## DEC-0007 — 2026-08-19 — Validación Dinámica de ObjectStrings.txt por Unión Exacta de Claves
+
+- **Estado:** aceptada
+- **Contexto:** En el Experimento 6D se detectó que la compuerta de validación `ValidateOnly` utilizaba un umbral estático mínimo (`$objStrLines -lt 50`), calibrado específicamente para Blackrock LE (que contenía 60 claves de ladder + 33 de PeepMode = 93 claves). Al procesar mapas limpios con pocas cadenas de ladder (como Washout LE, que solo declara 1 clave para luces), el total fusionado resultante de 33 claves provocaba un falso positivo con código 2 a pesar de que la fusión era 100% íntegra y completa.
+- **Decisión:**
+  1. **Eliminación de Umbrales Estáticos:** Se elimina cualquier umbral o conteo numérico rígido global para `ObjectStrings.txt`.
+  2. **Validación Dinámica por Unión de Claves:** El conjunto esperado de claves se deriva dinámicamente en tiempo de ejecución a partir de la unión exacta entre las claves de la fuente limpia (`$CleanMapPath`) y las del núcleo PeepMode (`$coreDir`).
+  3. **Control Estricto de Integridad (Exit Code 2):** Se verifica la presencia obligatoria de todas las claves esperadas, la coincidencia exacta de sus valores, la ausencia de claves duplicadas y la inexistencia de claves inesperadas en la salida. Cualquier discrepancia aborta con código de salida 2.
+  4. **Control Estricto de Conflictos de Valor (Exit Code 5):** Si una clave común entre la fuente limpia y el núcleo posee valores divergentes, la validación aborta inmediatamente con código de salida 5.
+- **Motivo:** Garantizar que la validación sea universal, agnóstica a la cantidad de cadenas de cada mapa del pool 2026 y matemáticamente rigurosa.
+- **Alternativas consideradas:**
+  - *Reducir el umbral estático a 33:* descartada por transferir el acoplamiento a Washout y fallar ante cualquier mapa con menos claves.
+  - *Omitir la validación de claves en ValidateOnly:* descartada por debilitar las garantías de integridad.
+- **Consecuencias:** Validación 100% determinista, escalable a cualquier mapa del pool y cubierta por una suite de 40 pruebas automatizadas.
+- **Revisar cuando:** Se incorpore soporte de localización multilingüe adicional fuera de `enUS`.
+
+## DEC-0008 — 2026-08-19 — Estándar de Configuración de Slots de Jugadores, Opciones Arcade y Supresión de Cuenta Regresiva
+
+- **Estado:** aceptada
+- **Contexto:** Durante las pruebas multijugador de Washout LE (Experimento 6I) se detectaron tres divergencias críticas entre los mapas limpios de ladder 1v1 y los mapas PeepMode funcionales en Battle.net:
+  1. **Conflicto de Publicación en Blizzard:** Los mapas de ladder vienen como `Melee/Custom Map` con `Automatically Add Multiplayer Data` activo, lo que bloquea la publicación en Battle.net al coexistir con la dependencia explícita `Void Multi (Mod)`.
+  2. **Lobby Limitado a 2 Slots:** En los mapas 1v1 de ladder solo existen Player 1 y Player 2 en `Player Properties`. Sin declarar del Player 1 al Player 10 en `Player Properties` y en `Game Variants`, la sala de espera de Battle.net solo asigna 2 casillas en lugar de 10.
+  3. **Temporizador de Cuenta Regresiva Melee Innecesario:** Al no marcarse `Disable Countdown Timer`, el motor de SC2 ejecuta la cuenta regresiva 3-2-1 (`Flags2 = 0x02`) antes de iniciar la cinemática de Faceoff de PeepMode.
+- **Decisión:**
+  1. **Publishing Options:** Configurar obligatoriamente `Publishing Options: Arcade Map` en `Map Properties → Options`.
+  2. **10 Slots en Player Properties:** Definir obligatoriamente los 10 jugadores (Player 1 al Player 10) con `Control: User` en `Map → Player Properties` (`Ctrl + Shift + P`) y activarlos en la variante `Other - PeepMode` de `Map → Game Variants`.
+  3. **Supresión de Cuenta Regresiva:** Marcar obligatoriamente `[x] Disable Countdown Timer` en `Map Properties → Options` y en `Map → Game Variants`, fijando `Flags2 = 0x01`.
+- **Motivo:** Garantizar que todos los mapas de la rotación 2026 expongan los 10 slots en el lobby de Arcade, publiquen sin bloqueos de Blizzard y arranquen de inmediato en el Faceoff de PeepMode.
+- **Consecuencias:** Estandarización total de los requisitos de configuración pre-publicación en el Editor para todos los mapas restantes del pool.
+- **Revisar cuando:** Se automatice la inyección directa de Player Structs y Flags en la cabecera binaria `MapInfo` en futuras versiones de Factory.

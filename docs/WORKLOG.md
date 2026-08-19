@@ -215,3 +215,54 @@
 - **Problemas conocidos:** Ninguno.
 - **Próximo paso recomendado:** Realizar el commit formal de Factory V2 en `factory/hardening-v2` e iniciar el trabajo del segundo mapa como prototipo.
 - **Mensaje de commit propuesto:** `feat(factory): finalize hardened Factory V2 with 34-test suite, conflict gates and clean pre-editor boundary`
+
+## 2026-08-19 12:10 — Corrección Dinámica de ValidateOnly, Suite de 40 Tests y Promoción de Configuración de Washout LE (Experimento 6D)
+
+- **Rama:** `map/washout`
+- **Commit base:** `c8745c68d5bf5b0a0e8fee4aace2bbfc8a9f7a09`
+- **Objetivo:** Corregir el defecto de umbral estático de `ValidateOnly` en `ObjectStrings.txt` implementando validación dinámica por unión exacta de claves, expandir la suite de tests a 40 casos (100% OK), incorporar formalmente `tools/map-configs/Washout.LE.json`, construir la salida `PRE_EDITOR_ONLY` de Washout LE con configuración validada y verificar la preservación y simetría de componentes.
+- **Archivos modificados / creados:**
+  - `tools/Build-PeepModeMap.ps1` (validación dinámica por unión de claves en ValidateOnly, eliminación de umbrales rígidos, reporte exacto de claves faltantes, duplicadas o corruptas)
+  - `tools/tests/Test-Build-PeepModeMap.ps1` (ampliación de 34 a 40 casos de prueba automatizados)
+  - `tools/map-configs/Washout.LE.json` (configuración formal declarativa para Washout LE con 10 puntos validados y simetría rotacional 180°)
+  - `docs/AUTOMATED_MAP_PIPELINE.md` (sección 6: validación dinámica de ObjectStrings)
+  - `docs/DECISIONS.md` (DEC-0007: validación dinámica por unión exacta de claves)
+  - `CHANGELOG.md` (versión 1.1.3)
+  - `docs/WORKLOG.md` (registro acumulativo append-only)
+- **Validaciones ejecutadas:**
+  - Suite de 40 pruebas automatizadas (`Test-Build-PeepModeMap.ps1`): **40/40 PASSED (100% OK)**.
+  - Validación sintáctica y de esquema de `Washout.LE.json` contra `peepmode-map-config.schema.json`: Conforme.
+  - Construcción de Washout LE en `prototype/validated-config-v1/Washout_PreEditor.SC2Map/`: Éxito con código de salida 0 y Release Gate geométrico aprobado.
+  - Auditoría estricta con `ValidateOnly`: Éxito con código de salida 0 sobre la salida construida.
+  - Comparación de coordenadas de build configurado vs revisión manual: Error Euclidiano = 0.0000 u en los 10 puntos.
+  - Verificación de formato y espacios: `git diff --check` = 0 advertencias.
+- **Resultado:** exitoso
+- **Evidencia:** `WASHOUT_CONFIGURED_BUILD_VALIDATION.md`, `WASHOUT_GEOMETRY_REVIEW_DIFF.csv`, `WASHOUT_REVIEWED_POINTS.csv` en `C:/SC2-PeepMode-Lab/washout/`.
+- **Problemas conocidos:** Ninguno. MapInfo permanece en estado `PRE_EDITOR_ONLY` conforme al diseño de pipeline.
+- **Próximo paso recomendado:** Commit y push de la configuración de Washout LE y las mejoras de Factory V2.
+- **Mensaje de commit propuesto:** `feat(washout): add validated map config and dynamic ObjectStrings validation in Factory V2`
+
+## 2026-08-19 18:00 — Validación Multijugador en Battle.net, Estándar Pre-Publicación (DEC-0008) y Promoción Oficial de Washout LE (Experimento 6J)
+
+- **Rama:** `map/washout`
+- **Commit base:** `1fdd56f7ac2775a4d1e6d00561d7bfbd99976f60`
+- **Objetivo:** Promover el artefacto final probado y validado en sesión multijugador real en Battle.net (`src/Published/PeepVoid_Washout_LE.SC2Map`), establecer el estándar pre-publicación DEC-0008 (Arcade Map, 10 slots con Control=User en Player Properties y supresión de cuenta regresiva Melee), ejecutar auditoría estructural completa y actualizar los registros del proyecto.
+- **Archivos modificados / creados:**
+  - `src/Published/PeepVoid_Washout_LE.SC2Map` (monolito final validado de Washout LE, 10.622.390 bytes, SHA-256: `207D305C9D36D03E8691447EEC40688BEA382CEAA3596CB5C8C047374057CF45`)
+  - `docs/DECISIONS.md` (DEC-0008: estándar de configuración de slots, opciones Arcade y supresión de temporizador Melee)
+  - `docs/AUTOMATED_MAP_PIPELINE.md` (sección 7: requisitos de configuración pre-publicación en el Editor)
+  - `CHANGELOG.md` (versión 1.2.0)
+  - `docs/WORKLOG.md` (registro acumulativo append-only)
+- **Detalles técnicos y validaciones ejecutadas:**
+  - Identificación inequívoca del candidato probado en Battle.net con 2 jugadores activos + observadores.
+  - Verificación de 10 puntos de cámara (`Point 001` a `Point 010`) con Error Euclidiano = 0.0000 u respecto a `Washout.LE.json` y simetría 180° exacta con centro `(88.0, 81.0)`.
+  - Preservación íntegra de ladder: 2 Start Locations, 196 unidades, 2.626 doodads, terreno y 15 catálogos `GameData` XML.
+  - Sanitización de metadatos: Cero correos/PII, créditos oficiales a Patches, Kelzorz y ktilkath.
+  - Suite de regresión automatizada: **40/40 PASSED (100% OK)**.
+  - Verificación de hash SHA-256 idéntico entre copia congelada en lab y archivo en `src/Published/`.
+  - `git diff --check`: 0 advertencias de formato o espacios.
+- **Resultado:** exitoso
+- **Evidencia:** `WASHOUT_FINAL_AUDIT.md`, `WASHOUT_FINAL_FROZEN_RECORD.md`, `WASHOUT_FINAL_CANDIDATES.md` en `C:/SC2-PeepMode-Lab/washout/release/final/`.
+- **Problemas conocidos:** Ninguno.
+- **Próximo paso recomendado:** Commit y push de la rama `map/washout`, merge a `integration/2026-map-pool` e inicio del siguiente mapa del pool 2026.
+- **Mensaje de commit propuesto:** `feat(washout): add multiplayer-validated PeepMode map`

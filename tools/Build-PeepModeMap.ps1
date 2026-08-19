@@ -158,11 +158,88 @@ if ($ValidateOnly) {
     if (-not (Test-Path (Join-Path $targetDir "Splat-Custom.m3"))) { Exit-WithCode 2 "Falta Splat-Custom.m3" }
     if (-not (Test-Path (Join-Path $targetDir "BankList.xml"))) { Exit-WithCode 2 "Falta BankList.xml" }
 
-    # 5. Comprobar ObjectStrings
+    # 5. Comprobar ObjectStrings mediante union dinamica de claves
     $objStrPath = Join-Path $targetDir "enUS.SC2Data\LocalizedData\ObjectStrings.txt"
-    if (-not (Test-Path $objStrPath)) { Exit-WithCode 2 "Falta ObjectStrings.txt" }
-    $objStrLines = (Get-Content $objStrPath | Where-Object { $_.Trim() -and -not $_.StartsWith("#") }).Count
-    if ($objStrLines -lt 50) { Exit-WithCode 2 "ObjectStrings.txt contiene solo $objStrLines claves (fusion incompleta)." }
+    if (-not (Test-Path $objStrPath)) { Exit-WithCode 2 "Falta ObjectStrings.txt en $targetDir" }
+
+    # Derivar claves esperadas dinamicamente desde fuente limpia y nucleo
+    $coreObjStrPath = Join-Path $coreDir "enUS.SC2Data\LocalizedData\ObjectStrings.txt"
+    $expectedObjDict = [System.Collections.Generic.Dictionary[string, string]]::new()
+
+    if ($CleanMapPath) {
+        $cleanCleanObjStr = Join-Path (Resolve-Path $CleanMapPath) "enUS.SC2Data\LocalizedData\ObjectStrings.txt"
+        if (Test-Path $cleanCleanObjStr) {
+            foreach ($line in [System.IO.File]::ReadAllLines($cleanCleanObjStr, [System.Text.Encoding]::UTF8)) {
+                if ($line.Trim() -and -not $line.StartsWith("#")) {
+                    $eqIdx = $line.IndexOf("=")
+                    if ($eqIdx -gt 0) {
+                        $k = $line.Substring(0, $eqIdx)
+                        $v = $line.Substring($eqIdx + 1)
+                        $expectedObjDict[$k] = $v
+                    }
+                }
+            }
+        }
+    }
+
+    if (Test-Path $coreObjStrPath) {
+        foreach ($line in [System.IO.File]::ReadAllLines($coreObjStrPath, [System.Text.Encoding]::UTF8)) {
+            if ($line.Trim() -and -not $line.StartsWith("#")) {
+                $eqIdx = $line.IndexOf("=")
+                if ($eqIdx -gt 0) {
+                    $k = $line.Substring(0, $eqIdx)
+                    $v = $line.Substring($eqIdx + 1)
+                    if (-not $expectedObjDict.ContainsKey($k)) {
+                        $expectedObjDict[$k] = $v
+                    } elseif ($expectedObjDict[$k] -ne $v) {
+                        Exit-WithCode 5 "Conflicto irreconciliable en ObjectStrings.txt: la clave '$k' tiene valores divergentes ('$($expectedObjDict[$k])' vs '$v')."
+                    }
+                }
+            }
+        }
+    }
+
+    # Parsear ObjectStrings.txt de la salida y detectar duplicados
+    $outObjLines = [System.IO.File]::ReadAllLines($objStrPath, [System.Text.Encoding]::UTF8)
+    $outObjDict = [System.Collections.Generic.Dictionary[string, string]]::new()
+    $outObjSeenKeys = [System.Collections.Generic.HashSet[string]]::new()
+
+    foreach ($line in $outObjLines) {
+        if ($line.Trim() -and -not $line.StartsWith("#")) {
+            $eqIdx = $line.IndexOf("=")
+            if ($eqIdx -gt 0) {
+                $k = $line.Substring(0, $eqIdx)
+                $v = $line.Substring($eqIdx + 1)
+                if ($outObjSeenKeys.Contains($k)) {
+                    Exit-WithCode 2 "Clave duplicada en ObjectStrings.txt: '$k'"
+                }
+                $outObjSeenKeys.Add($k) | Out-Null
+                $outObjDict[$k] = $v
+            }
+        }
+    }
+
+    if ($expectedObjDict.Count -gt 0) {
+        foreach ($k in $expectedObjDict.Keys) {
+            if (-not $outObjDict.ContainsKey($k)) {
+                Exit-WithCode 2 "Falta la clave esperada '$k' en ObjectStrings.txt de la salida."
+            }
+            if ($outObjDict[$k] -ne $expectedObjDict[$k]) {
+                Exit-WithCode 2 "Valor modificado o corrupto para la clave '$k' en ObjectStrings.txt (esperado: '$($expectedObjDict[$k])', real: '$($outObjDict[$k])')."
+            }
+        }
+        if ($CleanMapPath) {
+            foreach ($k in $outObjDict.Keys) {
+                if (-not $expectedObjDict.ContainsKey($k)) {
+                    Exit-WithCode 2 "Clave inesperada '$k' encontrada en ObjectStrings.txt de la salida."
+                }
+            }
+        }
+    } else {
+        if ($outObjDict.Count -eq 0) {
+            Exit-WithCode 2 "ObjectStrings.txt esta vacio en la salida."
+        }
+    }
 
     # 6. Comprobar Attributes y ComponentList
     if (-not (Test-Path (Join-Path $targetDir "Attributes"))) { Exit-WithCode 2 "Falta Attributes" }
