@@ -115,3 +115,24 @@
 - **Problemas conocidos:** `Ninguno`
 - **Próximo paso recomendado:** Publicación pública global en Battle.net (Americas, Europe, Asia) y aplicación del pipeline automatizado al siguiente mapa de la rotación.
 - **Mensaje de commit propuesto:** `feat: publish PeepVoid_Blackrock_LE and establish automated map factory pipeline`
+
+## 2026-08-19 09:05 — Sanitización de metadatos en Blackrock LE (Nuevo Golden Master)
+
+- **Rama:** `map/blackrock`
+- **Commit base:** `fb36ab9178cc652aa33f68f55a046e5bcb96848c`
+- **Objetivo:** Sanitizar la descripción del mapa `src/Published/PeepVoid_Blackrock_LE.SC2Map` para remover información personal, estableciendo la versión sanitizada como nuevo Golden Master de referencia para el pipeline.
+- **Archivos modificados:**
+  - `src/Published/PeepVoid_Blackrock_LE.SC2Map`
+  - `docs/WORKLOG.md`
+  - `CHANGELOG.md`
+- **Detalles técnicos de sanitización:**
+  - Corrección exclusiva de textos descriptivos para eliminar información personal.
+  - Cero alteraciones funcionales en geometría de terreno, mallas de colisión/placement, triggers Galaxy, inyección de cámaras (`Point 001` a `Point 010`), slots de jugadores (10 activos) o lógica de PeepMode.
+  - Tamaño final sanitizado: **21.486.970 bytes** (anterior: 21.486.984 bytes).
+  - SHA-256 final sanitizado: `3D3A86CB0B9154300AEFA656A282E7658DE17B7839AC1862932A8AC68C011026`.
+- **Validaciones ejecutadas:**
+  - Verificación de hash SHA-256 y tamaño de archivo en disco.
+  - Confirmación de ausencia de cambios colaterales en el árbol de trabajo (`git status`).
+- **Resultado:** exitoso
+- **Evidencia:** Golden Master de Blackrock LE actualizado y validado con hash `3D3A86CB0B9154300AEFA656A282E7658DE17B7839AC1862932A8AC68C011026`.
+- **Mensaje de commit propuesto:** `fix: remove personal information from Blackrock description`
