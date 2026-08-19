@@ -1,0 +1,103 @@
+{
+  "$schema": "../schemas/peepmode-map-config.schema.json",
+  "schemaVersion": "2.0.0",
+  "mapTitle": "Blackrock LE",
+  "mapAuthor": "AVEX",
+  "mapCredits": "Original ladder map by AVEX. PeepMode conversion by PeepMode Factory V2.",
+  "symmetryType": "Rotational180",
+  "symmetryCenter": {
+    "x": 89.0,
+    "y": 95.0,
+    "source": "calculated-midpoint"
+  },
+  "mapInfoStrategy": "PreserveLadderWithEditorGate",
+  "gameDataConflictPolicy": "FailOnConflict",
+  "points": {
+    "Point 001": {
+      "x": 141.0,
+      "y": 142.5,
+      "z": 0.0,
+      "source": "manual-validated",
+      "reviewed": true,
+      "notes": "Cámara Base Principal P1 enfocando Town Hall y recursos"
+    },
+    "Point 002": {
+      "x": 37.0,
+      "y": 47.5,
+      "z": 0.0,
+      "source": "manual-validated",
+      "reviewed": true,
+      "notes": "Cámara Base Principal P2 (simetría rotacional 180°)"
+    },
+    "Point 003": {
+      "x": 133.0,
+      "y": 137.0,
+      "z": 0.0,
+      "source": "manual-validated",
+      "reviewed": true,
+      "notes": "Cámara de bienvenida / intro sobre cuello de rampa P1"
+    },
+    "Point 004": {
+      "x": 45.0,
+      "y": 53.0,
+      "z": 0.0,
+      "source": "manual-validated",
+      "reviewed": true,
+      "notes": "Cámara de bienvenida / intro sobre cuello de rampa P2"
+    },
+    "Point 005": {
+      "x": 111.5222,
+      "y": 150.615,
+      "z": 0.0,
+      "source": "manual-validated",
+      "reviewed": true,
+      "notes": "Cámara Expansión Natural P1 (Town Hall al Oeste de P1)"
+    },
+    "Point 006": {
+      "x": 66.4775,
+      "y": 39.3847,
+      "z": 0.0,
+      "source": "manual-validated",
+      "reviewed": true,
+      "notes": "Cámara Expansión Natural P2 (Town Hall al Este de P2)"
+    },
+    "Point 007": {
+      "x": 133.4274,
+      "y": 140.6655,
+      "z": 0.0,
+      "source": "manual-validated",
+      "reviewed": true,
+      "notes": "Posición validada en golden master de Blackrock"
+    },
+    "Point 008": {
+      "x": 105.0,
+      "y": 83.0,
+      "z": 0.0,
+      "source": "symmetry-inferred",
+      "reviewed": true,
+      "notes": "Faceoff Auxiliar Slot 2"
+    },
+    "Point 009": {
+      "x": 44.5722,
+      "y": 49.3344,
+      "z": 0.0,
+      "source": "manual-validated",
+      "reviewed": true,
+      "notes": "Posición validada en golden master de Blackrock"
+    },
+    "Point 010": {
+      "x": 73.0,
+      "y": 107.0,
+      "z": 0.0,
+      "source": "symmetry-inferred",
+      "reviewed": true,
+      "notes": "Faceoff Auxiliar Slot 4"
+    }
+  },
+  "reviewStatus": {
+    "geometryReviewed": true,
+    "reviewer": "PeepMode Team Validation",
+    "reviewDate": "2026-08-19",
+    "notes": "Geometría 100% validada en pruebas de motor SC2 y reconciliada con golden master."
+  }
+}

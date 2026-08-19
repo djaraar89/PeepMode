@@ -136,3 +136,82 @@
 - **Resultado:** exitoso
 - **Evidencia:** Golden Master de Blackrock LE actualizado y validado con hash `3D3A86CB0B9154300AEFA656A282E7658DE17B7839AC1862932A8AC68C011026`.
 - **Mensaje de commit propuesto:** `fix: remove personal information from Blackrock description`
+
+## 2026-08-19 09:20 — Hardening e Implementación de PeepMode Factory V2 (Experimento 5B)
+
+- **Rama:** `factory/hardening-v2`
+- **Commit base:** `feee1ef57989392e21b203c9c9b33a042e61a6b0`
+- **Objetivo:** Implementar la versión endurecida y determinista de PeepMode Factory V2 (`tools/Build-PeepModeMap.ps1`), resolver los defectos de V1 (anidamiento de texturas, layouts faltantes, multimedia faltante, colisiones de IDs, fusión incompleta de ObjectStrings y desvío de cámaras naturales), incorporar validación por esquema JSON, compuertas de seguridad (Release Gates) y validar el pipeline reconstruyendo Blackrock LE contra el nuevo Golden Master.
+- **Archivos modificados / creados:**
+  - `tools/Build-PeepModeMap.ps1` (reescritura completa a V2 con 14 parámetros, 6 códigos de salida, Release Gates y auditorías)
+  - `tools/schemas/peepmode-map-config.schema.json` (esquema formal JSON Schema v7 para configuraciones de mapas)
+  - `tools/map-configs/Blackrock.LE.json` (configuración validada de 10 puntos para Blackrock LE)
+  - `tools/tests/Test-Build-PeepModeMap.ps1` (suite de 9 pruebas de regresión automatizadas)
+  - `docs/AUTOMATED_MAP_PIPELINE.md` (documentación formal de arquitectura, códigos de salida y flujo de trabajo)
+  - `docs/WORKLOG.md` (registro acumulativo append-only)
+  - `CHANGELOG.md` (registro acumulativo append-only)
+  - `docs/DECISIONS.md` (registro acumulativo append-only DEC-0004)
+- **Validaciones ejecutadas:**
+  - `Test-Build-PeepModeMap.ps1`: 9 de 9 pruebas automatizadas exitosas (100% OK).
+  - Simulación `-DryRun` validada sin efectos colaterales ni escrituras en disco.
+  - Reconstrucción de Blackrock LE (Run 1): 201 archivos generados en 784 ms con salida conforme.
+  - Comparativa de diferencias (`BLACKROCK_V2_DIFF.csv`): 0 regresiones; defectos de V1 resueltos (125 texturas en `Assets/Textures/`, 4 layouts `.SC2Layout`, multimedia `JelloPlanet.mp3`/`Splat-Custom.m3`, 54 claves de `ObjectStrings.txt`).
+  - Validación euclidiana de puntos de cámara: Error = 0.00 en todos los puntos (`Point 001` a `Point 010`).
+  - Reconstrucción idempotente (Run 2 e `IDEMPOTENCE_V2_DIFF.csv`): 0 discrepancias en componentes del mapa (100% bit-for-bit idéntico).
+  - Auditoría estricta con `-ValidateOnly`: Salida validada con código 0.
+- **Resultado:** exitoso
+- **Evidencia:** Suite de pruebas en `tools/tests/Test-Build-PeepModeMap.ps1` ejecutada al 100% satisfactoria; reportes y artefactos generados en `C:/SC2-PeepMode-Lab/factory-validation/v2/`.
+- **Problemas conocidos:** Ninguno. La compilación de Galaxy triggers y el empaquetado final a contenedor `.SC2Map` monolítico continúan reservados como compuerta de validación supervisada en el Editor de SC2.
+- **Próximo paso recomendado:** Integración de Factory V2 en rama de integración y procesamiento del siguiente mapa de la rotación oficial 2026.
+- **Mensaje de commit propuesto:** `feat(factory): implement PeepMode Factory V2 with JSON configs, release gates and test suite`
+
+## 2026-08-19 09:48 — Auditoría Pre-Commit de Factory V2 y Golden Master (Experimento 5C)
+
+- **Rama:** `factory/hardening-v2`
+- **Commit base:** `3e83f961e05c6f0b5164b1ef3dbf42152ad170e9`
+- **Objetivo:** Resolver contradicciones entre coordenadas históricas y el Golden Master, verificar la fuente de verdad autoritativa de componentes, auditar MapInfo y pantalla de carga, expandir la suite de tests a 30 casos y validar la idempotencia bit a bit.
+- **Archivos modificados / creados:**
+  - `tools/Build-PeepModeMap.ps1` (limpieza de espacios, comprobación segura de propiedades en Strict Mode)
+  - `tools/tests/Test-Build-PeepModeMap.ps1` (expansión a suite exhaustiva de 30 casos de prueba)
+  - `docs/AUTOMATED_MAP_PIPELINE.md` (declaración de MapInfo como PRE_EDITOR_ONLY y política de idempotencia)
+  - `docs/WORKLOG.md` (registro acumulativo append-only)
+  - `CHANGELOG.md` (registro acumulativo append-only)
+  - `docs/DECISIONS.md` (registro acumulativo append-only DEC-0005)
+- **Validaciones ejecutadas:**
+  - Golden Master Sanitizado verificado: `src/Published/PeepVoid_Blackrock_LE.SC2Map` (SHA-256: `3D3A86CB0B9154300AEFA656A282E7658DE17B7839AC1862932A8AC68C011026`, 21.486.970 bytes).
+  - Exportación de componentes frescos realizada en Editor de SC2 y registrada en `GOLDEN_CURRENT_MANIFEST.csv`.
+  - Matriz de autoridad de coordenadas (`POINT_AUTHORITY_MATRIX.csv`): Coordenadas de Point 001 a Point 010 en `tools/map-configs/Blackrock.LE.json` verificadas con Error Euclidiano = 0.0000 contra el Golden Master actual.
+  - Reproducción V1 vs V2 (`V1_V2_POINT_REPRODUCTION.csv`): Corrección y aclaración de la tabla de discrepancias de V1 (errores reales reproducidos: Point 001/002: 3.37u, Point 003/004: 2.01u, Point 005/006: 24.42u, Point 007/009: 44.06u).
+  - Suite de pruebas de regresión (`Test-Build-PeepModeMap.ps1`): 30 de 30 pruebas automatizadas PASSED (100% OK).
+  - Verificación de formato y espacios: `git diff --check` = 0 advertencias.
+  - Reconstrucción y validación completa: DryRun exitoso, Run 1 y Run 2 idénticos bit a bit en componentes SC2, ValidateOnly exitoso (Código 0).
+- **Resultado:** exitoso
+- **Evidencia:** `FACTORY_V2_PRECOMMIT_AUDIT.md`, `POINT_AUTHORITY_MATRIX.csv`, `V1_V2_POINT_REPRODUCTION.csv`, `GOLDEN_CURRENT_MANIFEST.csv`, `IDEMPOTENCE_POLICY.md` en `C:/SC2-PeepMode-Lab/factory-validation/v2/precommit-audit/`.
+- **Problemas conocidos:** Ninguno. MapInfo se conserva como `PRE_EDITOR_ONLY` (2 slots en pipeline / 10 slots al compilar en Editor).
+- **Próximo paso recomendado:** Realizar commit de Factory V2 en rama `factory/hardening-v2` y proceder con la preparación del segundo mapa de la rotación como prototipo.
+- **Mensaje de commit propuesto:** `feat(factory): harden PeepMode Factory V2 with JSON configs, release gates and 30-case test suite`
+
+## 2026-08-19 09:58 — Cierre Técnico Previo al Commit de Factory V2 (Experimento 5D)
+
+- **Rama:** `factory/hardening-v2`
+- **Commit base:** `3e83f961e05c6f0b5164b1ef3dbf42152ad170e9`
+- **Objetivo:** Ejecutar escaneo exhaustivo de caracteres de control C0, añadir tests independientes para colisiones de ID/nombre y conflictos de GameData/ObjectStrings (fallo estricto con Exit Code 5), clasificar la brecha de 6 componentes Pre-Editor y emitir el dictamen final de Commit Gate.
+- **Archivos modificados / creados:**
+  - `tools/Build-PeepModeMap.ps1` (bloqueo estricto con Exit Code 5 ante colisiones y divergencias de datos, validación temprana de DdsConverterPath, soporte explícito de schemaVersion 2.0.0 y 1.0.0)
+  - `tools/tests/Test-Build-PeepModeMap.ps1` (ampliación a 34 casos de prueba automatizados)
+  - `docs/AUTOMATED_MAP_PIPELINE.md` (declaración formal de política de MapInfo y límite PRE_EDITOR_ONLY)
+  - `docs/WORKLOG.md` (registro acumulativo append-only)
+  - `CHANGELOG.md` (registro acumulativo append-only)
+  - `docs/DECISIONS.md` (registro acumulativo append-only DEC-0006)
+- **Validaciones ejecutadas:**
+  - Escaneo de caracteres de control C0 (`CONTROL_CHARACTER_SCAN.md`): 0 bytes de control inesperados en el 100% de los archivos a incluir en el commit.
+  - Suite de pruebas automatizadas (`Test-Build-PeepModeMap.ps1`): 34 de 34 pruebas PASSED (100% OK).
+  - Brecha de componentes Pre-Editor (`PRE_EDITOR_COMPONENT_GAP.csv`): 0 archivos clasificados como `UNEXPECTED_MISSING`; las 6 diferencias respecto al Golden Master corresponden a metadatos de versión y empaquetado del Editor de SC2.
+  - Determinismo e Idempotencia: 198 de 198 componentes SC2 idénticos bit a bit entre ejecuciones sucesivas.
+  - Validación de coordenadas: Error Euclidiano Máximo = 0.0000 u en los 10 puntos respecto al Golden Master sanitizado.
+  - `git diff --check`: 0 advertencias de espacios en blanco.
+- **Resultado:** exitoso
+- **Evidencia:** `FACTORY_V2_COMMIT_GATE.md`, `CONTROL_CHARACTER_SCAN.md`, `PRE_EDITOR_COMPONENT_GAP.csv` en `C:/SC2-PeepMode-Lab/factory-validation/v2/precommit-audit/`.
+- **Problemas conocidos:** Ninguno.
+- **Próximo paso recomendado:** Realizar el commit formal de Factory V2 en `factory/hardening-v2` e iniciar el trabajo del segundo mapa como prototipo.
+- **Mensaje de commit propuesto:** `feat(factory): finalize hardened Factory V2 with 34-test suite, conflict gates and clean pre-editor boundary`

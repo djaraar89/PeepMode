@@ -1,0 +1,98 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "PeepModeMapConfig",
+  "description": "Configuración formal de mapa para PeepMode Map Factory V2",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "mapTitle",
+    "symmetryCenter",
+    "points"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "type": "string",
+      "enum": ["2.0.0", "2.0"]
+    },
+    "mapTitle": {
+      "type": "string"
+    },
+    "mapAuthor": {
+      "type": "string",
+      "default": "Blizzard Entertainment"
+    },
+    "mapCredits": {
+      "type": "string"
+    },
+    "symmetryType": {
+      "type": "string",
+      "enum": ["Rotational180", "MirrorHorizontal", "MirrorVertical", "Asymmetric", "Custom"],
+      "default": "Rotational180"
+    },
+    "symmetryCenter": {
+      "type": "object",
+      "required": ["x", "y"],
+      "properties": {
+        "x": { "type": "number" },
+        "y": { "type": "number" },
+        "source": { "type": "string" }
+      }
+    },
+    "loadingImage": {
+      "type": "object",
+      "properties": {
+        "ddsPath": { "type": "string" },
+        "pngPath": { "type": "string" }
+      }
+    },
+    "metadata": {
+      "type": "object",
+      "properties": {
+        "descriptionLong": { "type": "string" },
+        "descriptionShort": { "type": "string" }
+      }
+    },
+    "mapInfoStrategy": {
+      "type": "string",
+      "enum": ["PreserveLadderWithEditorGate", "StructuredTransform"],
+      "default": "PreserveLadderWithEditorGate"
+    },
+    "gameDataConflictPolicy": {
+      "type": "string",
+      "enum": ["FailOnConflict", "PreserveLadder", "OverwriteWithPeepMode"],
+      "default": "FailOnConflict"
+    },
+    "points": {
+      "type": "object",
+      "required": [
+        "Point 001", "Point 002", "Point 003", "Point 004",
+        "Point 005", "Point 006", "Point 007", "Point 008",
+        "Point 009", "Point 010"
+      ],
+      "additionalProperties": {
+        "type": "object",
+        "required": ["x", "y", "z", "source", "reviewed"],
+        "properties": {
+          "x": { "type": "number" },
+          "y": { "type": "number" },
+          "z": { "type": "number", "default": 0 },
+          "source": {
+            "type": "string",
+            "enum": ["manual-validated", "symmetry-inferred", "automatic-heuristic"]
+          },
+          "reviewed": { "type": "boolean" },
+          "notes": { "type": "string" }
+        }
+      }
+    },
+    "reviewStatus": {
+      "type": "object",
+      "properties": {
+        "geometryReviewed": { "type": "boolean" },
+        "reviewer": { "type": "string" },
+        "reviewDate": { "type": "string" },
+        "notes": { "type": "string" }
+      }
+    }
+  }
+}

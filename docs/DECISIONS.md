@@ -53,3 +53,51 @@
   - *Continuar con el proceso manual en cada mapa:* descartada por ser lento, propenso a errores de tipeo y requerir intervención repetitiva.
 - **Consecuencias:** Permite generar prototipos válidos en segundos y concentrar la intervención del usuario únicamente en la publicación en Battle.net.
 - **Revisar cuando:** Se actualice el motor base de PeepMode o se incorporen mapas con más de 2 posiciones de inicio (ej. mapas 4P).
+
+## DEC-0004 — 2026-08-19 — Arquitectura endurecida de PeepMode Factory V2 y separación de responsabilidades
+
+- **Estado:** aceptada
+- **Contexto:** La auditoría del Experimento 5A determinó que la primera versión del pipeline (`Build-PeepModeMap.ps1` V1) presentaba defectos estructurales (doble anidamiento en texturas, omisión de layouts y multimedia, fusión incompleta de cadenas, desvío geométrico en expansiones naturales >24u y borrado incondicional de directorios).
+- **Decisión:** Implementar y estandarizar **PeepMode Factory V2** bajo los siguientes principios arquitectónicos:
+  1. **Separación estricta de responsabilidades:** Distinguir explícitamente entre operaciones automáticas seguras (copia de núcleos, fusión XML/strings, layouts, texturas), propuestas geométricas heurísticas, coordenadas manuales validadas por mapa y compuertas del Editor de SC2.
+  2. **Configuraciones de mapa declarativas (JSON):** Centralizar la geometría y metadatos por mapa en `tools/map-configs/<MapTitle>.json` validados contra `tools/schemas/peepmode-map-config.schema.json`.
+  3. **Compuertas de seguridad (Release Gates):** Bloqueo automático (Exit Code 4) ante geometrías heurísticas no revisadas, requiriendo `-AllowHeuristicGeometry` exclusivamente para prototipado en laboratorio.
+  4. **Protección estricta de rutas de salida:** Prohibición absoluta de escribir en la raíz del repositorio o dentro de `src/Published/`, y exigencia de `-Force` para reutilizar directorios existentes.
+  5. **Determinismo e Idempotencia:** Garantizar que múltiples ejecuciones sobre la misma entrada produzcan exactamente los mismos hashes SHA-256 en todos los componentes del mapa.
+  6. **Suite de pruebas de regresión:** Integrar `tools/tests/Test-Build-PeepModeMap.ps1` para validar automáticamente el comportamiento de la Factory antes de procesar nuevos mapas.
+- **Motivo:** Garantizar la máxima confiabilidad, repetibilidad y seguridad en la conversión de mapas de ladder, eliminando el riesgo de regresiones o corrupción de datos.
+- **Alternativas consideradas:**
+  - *Mantener scripts heurísticos independientes por mapa:* descartada por alta duplicación de código y mantenimiento insostenible.
+  - *Automatizar la apertura del Editor de SC2 sin supervisión:* descartada por inestabilidad de la interfaz gráfica y riesgo de colisiones en Triggers.
+- **Consecuencias:** Pipeline 100% reproducible, auditable e idempotente, con pruebas automatizadas y soporte seguro para la rotación completa de mapas.
+- **Revisar cuando:** Se incorporen tipos de simetría adicionales (ej. simetría especular / 3 o 4 jugadores) o se modifique la estructura interna de componentes de SC2.
+
+## DEC-0005 — 2026-08-19 — Autoridad Geométrica del Golden Master y Política de Idempotencia de Componentes
+
+- **Estado:** aceptada
+- **Contexto:** Durante la auditoría del Experimento 5C se identificó una divergencia histórica entre las propuestas teóricas del plan inicial (`BLACKROCK_PROTOTYPE_PLAN_V2.md`) para los puntos de faceoff Point 007/009 y las coordenadas reales guardadas y probadas en el Golden Master empaquetado (`src/Published/PeepVoid_Blackrock_LE.SC2Map`). Asimismo, se requirió definir una política clara para distinguir la idempotencia de componentes SC2 frente a artefactos de auditoría con marcas temporales.
+- **Decisión:**
+  1. **Autoridad de Coordenadas:** El Golden Master empaquetado sanitizado actual (`3D3A86CB...`) constituye la **única fuente de verdad autoritativa** para coordenadas y componentes, prevaleciendo sobre cualquier boceto heurístico preliminar.
+  2. **Política de Idempotencia de Dos Niveles:** Se establece que todos los componentes de juego SC2 (198 archivos) deben ser estrictamente idempotentes e idénticos bit a bit (0 diferencias de hash SHA-256). Los artefactos de auditoría de entorno (`BUILD_REPORT.md`, `GEOMETRY_REVIEW.md`, `BUILD_MANIFEST.csv`, logs) pueden contener metadatos contextuales (rutas absolutas locales y timestamps de ejecución) y se excluyen de la prueba de idempotencia de juego.
+  3. **Estado de MapInfo:** Se documenta formalmente que Factory V2 genera componentes en estado `PRE_EDITOR_ONLY`, donde `Attributes` define las variantes de 10 slots y la serialización final del binario `MapInfo` se completa en el Editor de SC2 como puerta de publicación.
+- **Motivo:** Asegurar una referencia técnica inequívoca, eliminar ambigüedades en la validación y blindar el pipeline contra falsos positivos en pruebas de determinismo.
+- **Alternativas consideradas:**
+  - *Forzar timestamp fijo en todos los reportes de auditoría:* descartada para no perder la trazabilidad de fecha/hora en logs de auditoría en producción.
+  - *Adoptar coordenadas de boceto teórico en lugar del mapa publicado:* descartada por causar regresiones visuales en el encuadre de cámaras probado en juego.
+- **Consecuencias:** Reglas de validación precisas, suite de 30 tests 100% determinista y base sólida para el segundo mapa.
+- **Revisar cuando:** Se incorpore un compilador o serializador nativo de binarios MapInfo sin requerir el Editor de SC2.
+
+## DEC-0006 — 2026-08-19 — Manejo Estricto de Conflictos de Fusión de Datos y Escaneo de Caracteres de Control
+
+- **Estado:** aceptada
+- **Contexto:** Durante el cierre técnico del Experimento 5D se evaluó el riesgo de resolución silenciosa ante colisiones de claves en `ObjectStrings.txt` o registros divergentes en catálogos `GameData` XML, así como la posibilidad de bytes de control C0 no visibles introducidos por herramientas de edición.
+- **Decisión:**
+  1. **Fallo Estricto ante Divergencias (Exit Code 5):** Ante cualquier colisión en `ObjectStrings.txt` (misma clave con valores diferentes) o en catálogos `GameData` XML (mismo ID con contenido XML diferente), la Factory aborta inmediatamente con código de salida 5 en lugar de favorecer silenciosamente a ladder o a PeepMode.
+  2. **Política de Caracteres de Control C0:** Se prohíbe la presencia de caracteres de control C0 (0x00–0x08, 0x0B, 0x0C, 0x0E–0x1F) en los archivos del repositorio, garantizando texto plano UTF-8 limpio y portable.
+  3. **Límite Explícito de Conversión PNG:** La conversión de imágenes de carga `.png` a `.dds` requiere la provisión explícita de un ejecutable mediante `-DdsConverterPath`, abortando con código 6 si no está disponible, sin simular conversiones ficticias.
+- **Motivo:** Evitar corrupciones silenciosas de metadatos, prevenir divergencias de datos no supervisadas y garantizar la integridad estricta del pipeline de compilación.
+- **Alternativas consideradas:**
+  - *Sobrescribir silenciosamente con valores de PeepMode:* descartada por riesgo de romper strings específicos de ladder no identificados.
+  - *Permitir conversor PNG simulado:* descartada por violar la política de validación real verificable.
+- **Consecuencias:** Detección instantánea de incompatibilidades en mapas complejos y control absoluto sobre los componentes generados.
+- **Revisar cuando:** Se implemente un módulo de resolución interactiva o reglas semánticas de merge configurables por JSON.
